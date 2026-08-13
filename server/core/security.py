@@ -89,9 +89,9 @@ class APIKeyManager:
             data = self._keys.get(api_key)
             if not data or not data["is_active"]:
                 return None
-            data["total_calls"] += 1
-            data["last_used"] = time.time()
-            self._save_keys()
+            # data["total_calls"] += 1
+            # data["last_used"] = time.time()
+            # self._save_keys()
             return data
 
     def revoke(self, api_key: str) -> bool:
@@ -141,9 +141,9 @@ class CodeVault:
     def retrieve(self, endpoint_id: str) -> Optional[dict]:
         with self._lock:
             data = self._vault.get(endpoint_id)
-            if data:
-                data["execution_count"] += 1
-                self._save_vault()
+            # if data:
+            #     data["execution_count"] += 1
+            #     self._save_vault()
             return data
 
     def delete(self, endpoint_id: str) -> bool:
