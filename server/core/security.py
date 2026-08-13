@@ -126,11 +126,12 @@ class CodeVault:
     def _save_vault(self):
         self.file_path.write_text(json.dumps(self._vault, indent=2, ensure_ascii=False), encoding="utf-8")
 
-    def store(self, endpoint_id: str, encrypted_code: str, encryption_key: str, metadata: dict = None) -> bool:
+    def store(self, endpoint_id: str, encrypted_code: str, encryption_key: str, secrets: dict = None, metadata: dict = None) -> bool:
         with self._lock:
             self._vault[endpoint_id] = {
                 "encrypted_code": encrypted_code,
                 "encryption_key": encryption_key,
+                "secrets": secrets or {},
                 "stored_at": time.time(),
                 "metadata": metadata or {},
                 "execution_count": 0,

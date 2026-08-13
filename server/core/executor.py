@@ -46,7 +46,7 @@ class SafeExecutor:
         self.timeout_seconds = timeout_seconds
         self.max_output_size = max_output_size
 
-    def execute(self, code: str, inputs: dict) -> dict:
+    def execute(self, code: str, inputs: dict, env: dict = None) -> dict:
         """
         ينفذ الكود بأمان ويعيد النتيجة.
 
@@ -60,7 +60,7 @@ class SafeExecutor:
         start_time = time.time()
 
         # بناء بيئة التنفيذ المقيدة
-        safe_globals = self._build_safe_globals()
+        safe_globals = self._build_safe_globals(env or {})
         safe_locals = {}
 
         # التقاط stdout
@@ -122,7 +122,7 @@ class SafeExecutor:
         finally:
             sys.stdout = original_stdout
 
-    def _build_safe_globals(self) -> dict:
+    def _build_safe_globals(self, env: dict) -> dict:
         """
         يبني بيئة globals مقيدة تمنع الوصول لموارد النظام.
         """
@@ -138,6 +138,7 @@ class SafeExecutor:
             "__builtins__": safe_builtins,
             "__name__": "__cloakapi_sandbox__",
             "__doc__": None,
+            "ENV": env,  # توفير متغيرات البيئة داخل الساندبوكس
         }
 
         # إضافة مكتبة __import__ مقيدة
@@ -150,6 +151,15 @@ class SafeExecutor:
             return __import__(name, *args, **kwargs)
 
         safe_globals["__builtins__"]["__import__"] = restricted_import
+        
+        # إضافة دعم os.environ بشكل محدود
+        import os
+        class FakeOS:
+            environ = env
+            def getenv(self, key, default=None):
+                return self.environ.get(key, default)
+        
+        safe_globals["os"] = FakeOS()
 
         return safe_globals
 
