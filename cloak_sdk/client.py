@@ -27,7 +27,7 @@ class CloakClient:
             "User-Agent": "CloakAPI-SDK/1.0.0"
         })
 
-    def deploy(self, file_path: str, endpoint_name: str = None, description: str = "") -> dict:
+    def deploy(self, file_path: str, endpoint_name: str = None, description: str = "", secrets: dict = None) -> dict:
         """
         يقرأ ملف Python، يشفره، ويرفعه على الخادم كـ API.
         يعيد رابط الـ API ومفتاح المصادقة.
@@ -58,6 +58,7 @@ class CloakClient:
         payload = {
             "encrypted_code": encrypted_code,
             "encryption_key": encryption_key,
+            "secrets": secrets or {},
             "endpoint_name": endpoint_name or path.stem,
             "description": description,
             "original_filename": path.name,
@@ -118,6 +119,19 @@ class CloakClient:
             return []
         with open(config_file, "r", encoding="utf-8") as f:
             return json.load(f)
+
+    def stats(self, endpoint_id: str, api_key: str) -> dict:
+        """يجلب إحصاءات الاستخدام للـ Endpoint."""
+        try:
+            response = self._session.get(
+                f"{self.server_url}/stats/{endpoint_id}",
+                headers={"X-API-Key": api_key},
+                timeout=15
+            )
+            response.raise_for_status()
+        except requests.exceptions.HTTPError:
+            raise RuntimeError(f"فشل جلب الإحصاءات: {response.text}")
+        return response.json()
 
     def delete(self, endpoint_id: str, api_key: str) -> dict:
         """يحذف Endpoint من الخادم."""
