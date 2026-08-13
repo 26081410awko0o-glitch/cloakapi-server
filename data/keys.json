@@ -1,65 +1,22 @@
 {
-  
   "cloak_e473465708e4f221c85073d59ecdd1a47b45353ae06de8d6": {
-    
     "endpoint_id": "ep_d2c7afdf1b3ae260",
-    
     "created_at": 1786079248.746767,
-    
     "is_active": true,
-    
     "metadata": {
-      
       "name": "cloak-challenge"
-      
     },
-    
     "total_calls": 0,
-    
     "last_used": null
-    
   },
-  
   "cloak_e466f2f7a04040baa10f97118b2558a9": {
-    
     "endpoint_id": "ep_5bc17594fe9a442f",
-    
     "created_at": 1786079534.9113905,
-    
     "is_active": true,
-    
     "metadata": {
-      
       "name": "user-test-api"
-      
     },
-    
     "total_calls": 0,
-    
     "last_used": null
-    
   }
-  
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
