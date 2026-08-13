@@ -141,8 +141,21 @@ class SafeExecutor:
             "ENV": env,  # توفير متغيرات البيئة داخل الساندبوكس
         }
 
+        # إضافة دعم os.environ بشكل محدود
+        import os as real_os
+        class FakeOS:
+            environ = env
+            def getenv(self, key, default=None):
+                return self.environ.get(key, default)
+            def __getattr__(self, name):
+                raise AttributeError(f"الوصول إلى 'os.{name}' محظور لأسباب أمنية.")
+        
+        safe_os = FakeOS()
+
         # إضافة مكتبة __import__ مقيدة
         def restricted_import(name, *args, **kwargs):
+            if name == "os":
+                return safe_os
             if name not in ALLOWED_MODULES:
                 raise ImportError(
                     f"استيراد '{name}' غير مسموح به في بيئة CloakAPI. "
@@ -151,15 +164,7 @@ class SafeExecutor:
             return __import__(name, *args, **kwargs)
 
         safe_globals["__builtins__"]["__import__"] = restricted_import
-        
-        # إضافة دعم os.environ بشكل محدود
-        import os
-        class FakeOS:
-            environ = env
-            def getenv(self, key, default=None):
-                return self.environ.get(key, default)
-        
-        safe_globals["os"] = FakeOS()
+        safe_globals["os"] = safe_os
 
         return safe_globals
 
